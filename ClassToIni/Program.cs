@@ -1,17 +1,10 @@
-﻿using com.sun.tools.doclets.formats.html;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 internal class Program
 {
     private static void Main(string[] args)
     {
         //경로 지정
-        var ini = new ClassToIni(new FileInfo("test.ini"));
-        ini.CreateINI();
+        var ini = new Test(new FileInfo("test.ini"));
         ini.LoadINI();
         //로드한 거 확인
         Console.WriteLine(ini.Test1);
@@ -50,8 +43,6 @@ internal class Program
         [SectionName("Hi")]
         public double Test6 { get; set; } = 0.0; //기본값
 
-
-
         /// <summary>
         /// 사용하지 않음
         /// </summary>
@@ -60,6 +51,7 @@ internal class Program
 
         public Test(FileInfo fileInfo) : base(fileInfo)
         {
+
         }
     }
 }
