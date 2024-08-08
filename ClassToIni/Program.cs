@@ -21,7 +21,8 @@ internal class Program
         ini.Test4 = true;
         ini.Test5 = 0.15434f;
         ini.Test6 = 0.5223;
-
+        
+        //여기서 세팅 끝나면 classtoini class에서 프로퍼티값 바뀌고 saveini에선 바뀐 프로퍼티값 ini파일에 저장
         //저장
         ini.SaveINI();
     }
