@@ -14,14 +14,15 @@ namespace LogManager
         private static string mFolderPath = @"/TestLog/bh.cho/" + DateTime.Today.ToString("yyyy/MM/dd") + "/UI";
         private static string mdbFilePath = "../../Logviewer.db";
         private string mQuery;
+        private string mLogFilePath = $"{mFolderPath}/UI_{DateTime.Today:dd}_{mFileNumber}.log";
 
         private DirectoryInfo mDirectory = new DirectoryInfo(mFolderPath);
-        private SQLiteConnection mconnectDB = new SQLiteConnection($"Data Source={mdbFilePath};Version=3;");
+        private SQLiteConnection mConnectDB = new SQLiteConnection($"Data Source={mdbFilePath};Version=3;");
         
         
         public void ConnectDB()
         {
-            mconnectDB.Open();
+            mConnectDB.Open();
         }
         public void CreateLog(string Date, string Button)
         {
@@ -34,7 +35,7 @@ namespace LogManager
 
                 CreateTable();
 
-                EnsureLogFile();
+                FileSizeCheck();
 
                 using (StreamWriter WriteLog = new StreamWriter(mLogFilePath, true, Encoding.UTF8))
                 {
@@ -54,7 +55,7 @@ namespace LogManager
             {
                 StringBuilder result = new StringBuilder();
                 mQuery = "SELECT * FROM LOG WHERE date LIKE '%" + Date + "%' AND log LIKE '%" + Log + "%'";
-                using (SQLiteCommand command = new SQLiteCommand(mQuery, mconnectDB))
+                using (SQLiteCommand command = new SQLiteCommand(mQuery, mConnectDB))
                 {
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -79,7 +80,7 @@ namespace LogManager
             try
             {
                 mQuery = "SELECT log FROM LOG WHERE log LIKE @Log";
-                using (SQLiteCommand command = new SQLiteCommand(mQuery, mconnectDB))
+                using (SQLiteCommand command = new SQLiteCommand(mQuery, mConnectDB))
                 {
                     command.Parameters.AddWithValue("@Log", "%" + Log + "%");
                     using (SQLiteDataReader reader = command.ExecuteReader())
@@ -106,7 +107,7 @@ namespace LogManager
             {
                 string searchDate = Date.ToString("yyyy-MM-dd");
                 mQuery = "SELECT date FROM LOG WHERE date LIKE '%"+ searchDate + "%'";
-                using (SQLiteCommand command = new SQLiteCommand(mQuery, mconnectDB))
+                using (SQLiteCommand command = new SQLiteCommand(mQuery, mConnectDB))
                 {
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -153,8 +154,8 @@ namespace LogManager
                 MessageBox.Show(e.Message);
             }
         }
-        private string mLogFilePath => $"{mFolderPath}/UI_{DateTime.Today:dd}_{mFileNumber}.log";
-        private void EnsureLogFile()
+        
+        private void FileSizeCheck()
         {
             while (true)
             {
@@ -175,7 +176,7 @@ namespace LogManager
             }
 
             mQuery = "CREATE TABLE IF NOT EXISTS LOG(date DATETIME, log TEXT)";
-            using (SQLiteCommand command = new SQLiteCommand(mQuery, mconnectDB))
+            using (SQLiteCommand command = new SQLiteCommand(mQuery, mConnectDB))
             {
                 command.ExecuteNonQuery();
             }
@@ -183,7 +184,7 @@ namespace LogManager
         private void InsertData(string Date, string Log)
         {
             mQuery = "INSERT INTO LOG(date, log) VALUES(@Date, @Log)";
-            using (SQLiteCommand command = new SQLiteCommand(mQuery, mconnectDB))
+            using (SQLiteCommand command = new SQLiteCommand(mQuery, mConnectDB))
             {
                 command.Parameters.AddWithValue("@Date", Date);
                 command.Parameters.AddWithValue("@Log", Log);
