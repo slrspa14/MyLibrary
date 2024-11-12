@@ -1,15 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using static Program;
 using System.Reflection;
 
-class ClassToIni
+public class ClassToIni
 {
     private string mFilePath;
     public ClassToIni(FileInfo fileName)
     {
         mFilePath = fileName.FullName;
-        if(!File.Exists(mFilePath))
+        if (!File.Exists(mFilePath))
         {
             SaveINI();
         }
@@ -65,7 +64,7 @@ class ClassToIni
             }
         }
     }
-    
+
     private string GetIniValue(string section, string key, string Default, string filePath)
     {
         //ini 파일 읽어오기
@@ -76,29 +75,21 @@ class ClassToIni
     private void SetProperty(PropertyInfo propertyInfo, string value)
     {
         //프로퍼티값 설정하기
-        if(propertyInfo.PropertyType == typeof(int))
+        // Null 체크 및 기본값 처리
+        if (string.IsNullOrEmpty(value)) return;
+
+        // Enum인 경우 따로 처리
+        if (propertyInfo.PropertyType.IsEnum)
         {
-            propertyInfo.SetValue(this, int.Parse(value));
+            var enumValue = Enum.Parse(propertyInfo.PropertyType, value);
+            propertyInfo.SetValue(this, enumValue);
         }
-        else if(propertyInfo.PropertyType == typeof(string))
+        else
         {
-            propertyInfo.SetValue(this, value);
+            // 프로퍼티 타입에 맞게 형 변환
+            var convertedValue = Convert.ChangeType(value, propertyInfo.PropertyType);
+            propertyInfo.SetValue(this, convertedValue);
         }
-        else if (propertyInfo.PropertyType == typeof(ETest))
-        {
-            propertyInfo.SetValue(this, Enum.Parse(propertyInfo.PropertyType,value));
-        }
-        else if(propertyInfo.PropertyType == typeof(bool))
-        {
-            propertyInfo.SetValue(this, bool.Parse(value));
-        }
-        else if( propertyInfo.PropertyType == typeof(float))
-        {
-            propertyInfo.SetValue(this, float.Parse(value));
-        }
-        else if(propertyInfo.PropertyType == typeof(double))
-        {
-            propertyInfo.SetValue(this, double.Parse(value));
-        }
+
     }
 }
